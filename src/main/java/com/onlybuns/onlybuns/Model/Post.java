@@ -29,18 +29,18 @@ public class Post {
     private Long id;
 
     private String description;
-    private String imageUrl;
-    
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
     private Location location;
+
     private Date creationTime;
+
     private Long likes;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id", nullable = false)
-    private Image image; // This will store the Image entity
+    private Image image; 
 
 
 }

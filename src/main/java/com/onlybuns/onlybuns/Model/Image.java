@@ -21,5 +21,5 @@ public class Image {
     private String name;
 
     @Lob
-    private byte[] data; // Storing image as a byte array
+    private String data; 
 }
