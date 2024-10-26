@@ -44,7 +44,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
             .cors(cors -> cors.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/activate").permitAll() // Permit all for registration and activation
+                .requestMatchers(
+                "/api/users/register", "/api/users/activate",
+                "/api/locations/create","api/locations/{id}",
+                "/api/posts/create"
+                ).permitAll() // Permit all for registration and activation
                 .anyRequest().authenticated() // Protect all other endpoints
             )
             .sessionManagement(sess -> sess
