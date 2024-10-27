@@ -69,7 +69,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                 "/api/users/register", "/api/users/activate",
-                "/api/locations/create","api/locations/{id}",
+                "/api/locations/create","api/locations/{id}","/api/users/login", 
                 "/api/posts/create","/api/posts/{id}"
                 ).permitAll() // Permit all for registration and activation
                 .anyRequest().authenticated() // Protect all other endpoints
