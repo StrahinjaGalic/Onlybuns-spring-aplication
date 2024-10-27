@@ -1,9 +1,13 @@
 package com.onlybuns.onlybuns.Service;
 
+import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Model.UserInfoDetails;
 import com.onlybuns.onlybuns.Repository.UserRepository;
+
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +30,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private JwtService jwtService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
@@ -35,6 +42,7 @@ public class UserService implements UserDetailsService {
         return new UserInfoDetails(user); // Ensure UserInfoDetails implements UserDetails
     }
 
+    @Transactional
     public User registerUser(User user) throws Exception {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new Exception("Username is already taken");
@@ -49,6 +57,9 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setActive(false);
         user.setActivationToken(activationToken);
+        if (user.getRole() == null) {
+            user.setRole(Role.USER);
+                }
 
         User savedUser = userRepository.save(user);
         String activationLink = "http://localhost:8080/api/users/activate?token=" + activationToken;
@@ -85,4 +96,22 @@ public class UserService implements UserDetailsService {
             throw new Exception("Failed to send activation email", e);
         }
     }
+
+    public Optional<String> loginUser(String username, String password) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
+
+        // Check if user exists and if the password matches
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+            // Generate a JWT token using the username and role
+            String token = jwtService.generateToken(user.get().getUsername());
+            return Optional.of(token);
+        }
+
+        // Return an empty Optional if authentication fails
+        return Optional.empty();
+    }
+
+
+
+
 }
