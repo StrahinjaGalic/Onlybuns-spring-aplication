@@ -70,7 +70,8 @@ public class SecurityConfig {
                 .requestMatchers(
                 "/api/users/register", "/api/users/activate",
                 "/api/locations/create","api/locations/{id}",
-                "/api/posts/create","/api/posts/{id}"
+                "/api/posts/create","/api/posts/{id}",
+                "/api/images"
                 ).permitAll() // Permit all for registration and activation
                 .anyRequest().authenticated() // Protect all other endpoints
             )
