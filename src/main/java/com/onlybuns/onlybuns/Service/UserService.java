@@ -23,7 +23,7 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -59,7 +59,7 @@ public class UserService implements UserDetailsService {
         user.setActivationToken(activationToken);
         if (user.getRole() == null) {
             user.setRole(Role.USER);
-                }
+        }
 
         User savedUser = userRepository.save(user);
         String activationLink = "http://localhost:8080/api/users/activate?token=" + activationToken;
@@ -110,8 +110,5 @@ public class UserService implements UserDetailsService {
         // Return an empty Optional if authentication fails
         return Optional.empty();
     }
-
-
-
 
 }
