@@ -73,7 +73,7 @@ public class SecurityConfig {
                 "/api/posts/create","/api/posts/{id}",
                 "/api/locations/create","api/locations/{id}",
                 "/api/posts/create","/api/posts/{id}",
-                "/api/images"
+                "/api/images","/api/posts"
                 ).permitAll() // Permit all for registration and activation
                 .anyRequest().authenticated() // Protect all other endpoints
             )
