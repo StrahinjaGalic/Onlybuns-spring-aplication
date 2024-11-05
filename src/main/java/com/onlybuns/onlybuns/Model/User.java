@@ -34,7 +34,7 @@ public class User {
     private boolean isActive;
     
     @Enumerated(EnumType.STRING)
-    private Role role;
+    public Role role;
     
     @Column(unique = true)
     private String activationToken;
