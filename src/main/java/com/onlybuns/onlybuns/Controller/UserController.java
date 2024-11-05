@@ -2,6 +2,10 @@ package com.onlybuns.onlybuns.Controller;
 
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Service.UserService;
+
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,4 +54,23 @@ public class UserController {
                 .map(user -> new ResponseEntity<>(user, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginRequest) {
+        String username = loginRequest.get("username");
+        String password = loginRequest.get("password");
+
+        // Try to authenticate the user and get a token
+        Optional<String> token = userService.loginUser(username, password);
+
+        if (token.isPresent()) {
+            // Return the token if authentication is successful
+            return ResponseEntity.ok(Map.of("token", token.get()));
+        } else {
+            // Return an error response if authentication fails
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+        }
+    }
+
+
 }
