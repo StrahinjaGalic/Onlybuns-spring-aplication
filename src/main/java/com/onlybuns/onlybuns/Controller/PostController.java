@@ -45,4 +45,10 @@ public class PostController {
         List<Post> posts = postService.getAllPosts(); // Retrieve all posts
         return ResponseEntity.ok(posts); // Return 200 with the list of posts
     }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<Post>> getPostsByUsername(@PathVariable String username) {
+        List<Post> posts = postService.getByUsername(username); // Retrieve posts by username
+        return ResponseEntity.ok(posts); // Return 200 with the list of posts
+    }
 }
