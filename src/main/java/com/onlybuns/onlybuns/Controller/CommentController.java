@@ -57,7 +57,7 @@ public class CommentController {
         }
         catch (Exception e)
         {
-            return new ResponseEntity<>("Failed to remove comment.",HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to delete comment.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping("/user/{username}")

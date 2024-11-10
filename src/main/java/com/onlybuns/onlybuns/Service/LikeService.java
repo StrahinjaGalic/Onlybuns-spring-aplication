@@ -30,5 +30,17 @@ public class LikeService {
     {
         likeRepository.deleteById(id);
     }
+    public boolean userHasLikedPost(Long postId,String username)
+    {
+        return likeRepository.existsByPostIdAndUsername(postId,username);
+    }
+    public int countLikesByPost(Long postId)
+    {
+        return (int) likeRepository.countByPostId(postId);
+    }
+    public Long getLikeIdByPostIdAndUsername(Long postId,String username)
+    {
+        return likeRepository.getLikeIdByPostIdAndUsername(postId,username);
+    }
 
 }

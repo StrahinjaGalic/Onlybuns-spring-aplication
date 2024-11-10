@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Repository.PostRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -25,8 +26,9 @@ public class PostService {
         return postRepository.save(post); // Saving post and returning the saved instance
     }
 
+    @Transactional
     public List<Post> getAllPosts() {
-        return postRepository.findAll(); // Retrieve all posts
+        return postRepository.findByDeletedFalse(); // Retrieve all posts
     }
 
     public Optional<Post> getPostById(Long id) {
@@ -34,11 +36,13 @@ public class PostService {
     }
 
     public void deletePost(Long id) {
-        postRepository.deleteById(id); // Delete a post by its ID
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found with Id " + id));
+        post.setDeleted(true);
+        postRepository.save(post);
     }
 
     @Transactional
     public List<Post> getByUsername(String username) {
-        return postRepository.findByUsername(username); // Retrieve all posts by a specific user
+        return postRepository.findByUsernameAndDeletedFalse(username); // Retrieve all posts by a specific user
     }
 }
