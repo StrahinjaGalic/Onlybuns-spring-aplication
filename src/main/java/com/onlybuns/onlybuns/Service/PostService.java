@@ -45,4 +45,19 @@ public class PostService {
     public List<Post> getByUsername(String username) {
         return postRepository.findByUsernameAndDeletedFalse(username); // Retrieve all posts by a specific user
     }
+
+    
+    public Optional<Post> updatePost(Long postId,Post updatedPost) {
+        Optional<Post> existingPost = postRepository.findById(postId);
+        if(existingPost.isPresent())
+        {
+            Post post = existingPost.get();
+            post.setDescription(updatedPost.getDescription());
+            post.setLocation(updatedPost.getLocation());
+            post.setImage(updatedPost.getImage());
+            post.setEdited(true);
+            return Optional.of(postRepository.save(post));
+        }
+        return Optional.empty();
+    }
 }

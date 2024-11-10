@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .requestMatchers(
                 "/api/users/register", "/api/users/activate",
                 "/api/locations/create","api/locations/{id}","/api/users/login", "/api/users/{username}",
-                "/api/posts/create","/api/posts/{id}","/api/posts/user/{username}","/api/posts/delete/{id}",
+                "/api/posts/create","/api/posts/{id}","/api/posts/user/{username}","/api/posts/delete/{id}","/api/posts/edit/{id}",
                 "/api/locations/create","api/locations/{id}",
                 "/api/posts/create","/api/posts/{id}",
                 "/api/images","/api/posts",

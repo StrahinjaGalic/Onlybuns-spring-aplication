@@ -44,5 +44,6 @@ public class Post {
     private String username;
 
     private boolean deleted;
+    private boolean edited;
 
 }
