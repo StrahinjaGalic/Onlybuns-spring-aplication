@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,11 @@ public class User {
     
     private String password;
     private String name;
+    
+    @Pattern(
+        regexp = "^[A-Za-z\\s]+,[A-Za-z\\s]+,[A-Za-z\\s]+,\\d+$", 
+        message = "Address format should be 'country,city,street,number'"
+    )
     private String address;
     private boolean isActive;
     
