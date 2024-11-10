@@ -73,7 +73,9 @@ public class SecurityConfig {
                 "/api/posts/create","/api/posts/{id}",
                 "/api/locations/create","api/locations/{id}",
                 "/api/posts/create","/api/posts/{id}",
-                "/api/images","/api/posts"
+                "/api/images","/api/posts",
+                "/api/likes/create","/api/likes/delete/{id}","/api/likes/user/{username}","/api/likes/post/{postId}",
+                "/api/comments/create","/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}"
                 ).permitAll() // Permit all for registration and activation
                 .anyRequest().authenticated() // Protect all other endpoints
             )
