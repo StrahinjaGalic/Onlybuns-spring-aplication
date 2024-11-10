@@ -51,4 +51,18 @@ public class PostController {
         List<Post> posts = postService.getByUsername(username); // Retrieve posts by username
         return ResponseEntity.ok(posts); // Return 200 with the list of posts
     }
+    
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id)
+    {
+        try
+        {
+            postService.deletePost(id);
+            return new ResponseEntity<>("Post deleted.",HttpStatus.OK);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>("Failed to delete post.",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

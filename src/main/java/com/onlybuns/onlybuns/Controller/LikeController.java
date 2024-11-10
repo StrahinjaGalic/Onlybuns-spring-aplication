@@ -2,6 +2,7 @@ package com.onlybuns.onlybuns.Controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onlybuns.onlybuns.Dto.LikeDto;
+import com.onlybuns.onlybuns.Dto.LikeResponseDto;
 import com.onlybuns.onlybuns.Model.Like;
+import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Service.LikeService;
+import com.onlybuns.onlybuns.Service.PostService;
+
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -27,6 +34,8 @@ public class LikeController {
     
     @Autowired
     public LikeService likeService;
+    @Autowired
+    public PostService postService;
 
     @PostMapping("/create")
     public ResponseEntity<String> createLike(@RequestBody Like like) 
@@ -72,6 +81,7 @@ public class LikeController {
         List<LikeDto> likeDtos = likes.stream().map(like -> new LikeDto(like.getId(),like.getPost().getId(),like.getUsername())).collect(Collectors.toList());
         return ResponseEntity.ok(likeDtos);
     }
+    /* 
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<LikeDto>> getLikesByPost(@PathVariable Long postId) 
     {
@@ -79,6 +89,25 @@ public class LikeController {
         List<LikeDto> likeDtos = likes.stream().map(like -> new LikeDto(like.getId(),like.getPost().getId(),like.getUsername())).collect(Collectors.toList());
         return ResponseEntity.ok(likeDtos);
     }
+    */
+    @GetMapping("/post/{username}/{postId}")
+    public ResponseEntity<LikeResponseDto> getLikesForPost(@PathVariable String username,@PathVariable Long postId) 
+    {
+        Optional<Post> optionalPost = postService.getPostById(postId);
+        if(optionalPost.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        int likeCount = likeService.countLikesByPost(postId);
+        boolean userLiked = likeService.userHasLikedPost(postId,username);
+        Long userLikeId = null;
+        if(userLiked) {
+            userLikeId = likeService.getLikeIdByPostIdAndUsername(postId,username);
+        }
+
+        LikeResponseDto response = new LikeResponseDto(likeCount, userLiked,userLikeId);
+        return ResponseEntity.ok(response);
+    }
+    
     
     
 
