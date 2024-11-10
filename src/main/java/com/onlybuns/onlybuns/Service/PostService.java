@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Repository.PostRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +37,7 @@ public class PostService {
         postRepository.deleteById(id); // Delete a post by its ID
     }
 
+    @Transactional
     public List<Post> getByUsername(String username) {
         return postRepository.findByUsername(username); // Retrieve all posts by a specific user
     }
