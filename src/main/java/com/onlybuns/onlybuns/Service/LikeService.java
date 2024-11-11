@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.onlybuns.onlybuns.Model.Like;
-import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Repository.LikeRepository;
 
 @Service
