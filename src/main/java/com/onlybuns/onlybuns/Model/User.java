@@ -31,6 +31,7 @@ public class User {
     
     private String password;
     private String name;
+    private String surname;
     
     @Pattern(
         regexp = "^[A-Za-z\\s]+,[A-Za-z\\s]+,[A-Za-z\\s]+,\\d+$", 
