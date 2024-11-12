@@ -69,13 +69,16 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                 "/api/users/register", "/api/users/activate",
-                "/api/locations/create","/api/locations/{id}","/api/users/login", 
-                "/api/posts/create","/api/posts/{id}",
-                "/api/locations/create","/api/locations/{id}",
-                "/api/posts/create","/api/posts/{id}",
-                "/api/images","/api/posts","/api/users/{username}",
+                "/api/locations/{id}","/api/users/login", 
+                "/api/posts/{id}",
+                "/api/locations/{id}",
+                "/api/posts/{id}",
+                "/api/posts","/api/users/{username}",
                 "/api/posts/user/{username}"
-                ).permitAll() // Permit all for registration and activation
+                ).permitAll()
+                .requestMatchers(
+                "/api/posts/create","/api/images","/api/locations/create"
+            ).hasRole("USER")
                 .anyRequest().authenticated() // Protect all other endpoints
             )
             .sessionManagement(sess -> sess
