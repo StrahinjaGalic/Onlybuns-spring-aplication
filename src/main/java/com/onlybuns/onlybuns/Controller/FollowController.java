@@ -10,10 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onlybuns.onlybuns.Dto.FollowResponseDto;
 import com.onlybuns.onlybuns.Model.Follow;
 import com.onlybuns.onlybuns.Service.FollowService;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -23,20 +28,18 @@ public class FollowController {
     FollowService followService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> createPost(@RequestBody Follow follow) {
-        try 
+    public ResponseEntity<FollowResponseDto> createPost(@RequestBody Follow follow) {
+        
+        Follow followCreated = followService.create(follow);
+        if(followCreated != null)
         {
-            if (!follow.getUsername().isEmpty() && !follow.getUsername().isEmpty()) 
-            {
-                followService.create(follow);
-                return new ResponseEntity<>("Follow created.", HttpStatus.CREATED);
-            } else 
-            {
-                return new ResponseEntity<>("Usernames must not be empty.", HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) 
+            FollowResponseDto followResponseDto = new FollowResponseDto(true, followCreated.getId());
+            return ResponseEntity.ok(followResponseDto);
+        }
+        else
         {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            FollowResponseDto followResponseDto = new FollowResponseDto(false, null);
+            return ResponseEntity.ok(followResponseDto);
         }
     }
     @GetMapping("/{username}/following")
@@ -51,4 +54,24 @@ public class FollowController {
         List<Follow> followers = followService.getAllFollowers(username);
         return ResponseEntity.ok(followers);
     }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteFollowing(@PathVariable long id)
+    {
+        try
+        {
+            followService.deleteById(id);
+            return new ResponseEntity<>("Follow deleted.",HttpStatus.ACCEPTED);
+        }
+        catch (Exception e)
+        {
+            return new ResponseEntity<>("Failed to delete follow.",HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/check")
+    public ResponseEntity<FollowResponseDto> checkIfFollowing(@RequestParam String username,@RequestParam String followingUsername) 
+    {
+        FollowResponseDto response = followService.getFollowStatus(username, followingUsername);
+        return ResponseEntity.ok(response);
+    }
+    
 }
