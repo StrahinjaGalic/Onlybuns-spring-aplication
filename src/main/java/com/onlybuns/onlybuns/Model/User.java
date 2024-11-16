@@ -1,5 +1,8 @@
 package com.onlybuns.onlybuns.Model;
 
+import java.sql.Date;
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,5 +48,10 @@ public class User {
     
     @Column(unique = true)
     private String activationToken;
+
+    public LocalDate lastActivity;
+    
+
+    
 }
 

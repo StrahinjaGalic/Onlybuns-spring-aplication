@@ -1,10 +1,13 @@
 package com.onlybuns.onlybuns.Service;
 
+import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Model.UserInfoDetails;
 import com.onlybuns.onlybuns.Repository.UserRepository;
 
+import io.jsonwebtoken.io.IOException;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 
@@ -15,6 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +37,46 @@ public class UserService implements UserDetailsService {
     private EmailService emailService;
 
     @Autowired
+    private PostService postService;
+
+    @Autowired 
+    private LikeService likeService;
+
+    @Autowired
     private JwtService jwtService;
+
+
+    @PostConstruct
+    public void init() throws java.io.IOException, MessagingException{
+        try{
+            sendInactiveNotifications();
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sendInactiveNotifications() throws java.io.IOException, MessagingException
+    {
+        List<User> users = userRepository.findAll();
+
+        for(User user : users)
+        {
+            long days = ChronoUnit.DAYS.between(user.getLastActivity(),LocalDate.now());
+
+            if(days >= 7)
+            {
+                long likes = 0;
+                List<Post> posts = postService.getByUsername(user.getUsername());
+                for(Post post : posts){
+                    likes = likes + likeService.countLikesByPost(post.getId());
+                }
+                
+                emailService.sendInactiveEmail(user.getEmail(),user.getUsername(),likes);
+            }
+        }
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -58,6 +102,7 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setActive(false);
         user.setActivationToken(activationToken);
+        user.setLastActivity(LocalDate.now());
         if (user.getRole() == null) {
             user.setRole(Role.USER);
         }
@@ -99,12 +144,21 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<String> loginUser(String username, String password) {
-        Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username));
+        User user_model = userRepository.findByUsername(username);
+        Optional<User> user = Optional.ofNullable(user_model);
+        
 
         // Check if user exists and if the password matches
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
             // Generate a JWT token using the username and role
+
             String token = jwtService.generateToken(user.get().getUsername());
+            user_model.setLastActivity(LocalDate.now());
+            userRepository.save(user_model);
+          
+ 
+     
+            
             return Optional.of(token);
         }
 

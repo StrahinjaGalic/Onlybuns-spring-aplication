@@ -26,4 +26,14 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendInactiveEmail(String mail,String username,long likes) throws MessagingException{
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message,true);
+
+        helper.setTo(mail);
+        helper.setSubject("We miss you "  + username + "!");
+        helper.setText("<p>It has been a while since you visited our app!</p><p>You have " + likes + " likes on your posts.</p>",true);
+        mailSender.send(message);
+    }
 }
