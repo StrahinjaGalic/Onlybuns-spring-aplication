@@ -73,7 +73,7 @@ public class SecurityConfig {
                 "/api/posts/{id}","/api/posts/user/{username}","/api/posts/delete/{id}","/api/posts/edit/{id}","/api/posts",
                 "/api/likes/delete/{id}","/api/likes/user/{username}","/api/likes/post/{username}/{postId}","/api/likes/create",
                 "/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}","/api/comments/create",
-                "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create"
+                "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create","api/locations"
                 ).permitAll()
                 .requestMatchers(
                 "/api/posts/create","/api/images","/api/locations/create"
