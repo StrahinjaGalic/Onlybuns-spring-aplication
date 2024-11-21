@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onlybuns.onlybuns.Dto.FollowResponseDto;
 import com.onlybuns.onlybuns.Model.Follow;
 import com.onlybuns.onlybuns.Service.FollowService;
+import com.onlybuns.onlybuns.Service.FollowRateLimiterService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,15 +27,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class FollowController {
     @Autowired
     FollowService followService;
+    @Autowired
+    FollowRateLimiterService followRateLimiterService;
 
     @PostMapping("/create")
     public ResponseEntity<FollowResponseDto> createPost(@RequestBody Follow follow) {
-        
-        Follow followCreated = followService.create(follow);
-        if(followCreated != null)
+        boolean allowedToFollow = followRateLimiterService.canFollow(follow.getUsername());
+
+        if(allowedToFollow)
         {
-            FollowResponseDto followResponseDto = new FollowResponseDto(true, followCreated.getId());
-            return ResponseEntity.ok(followResponseDto);
+            Follow followCreated = followService.create(follow);
+            if(followCreated != null)
+            {
+                FollowResponseDto followResponseDto = new FollowResponseDto(true, followCreated.getId());
+                return ResponseEntity.ok(followResponseDto);
+            }
+            else
+            {
+                FollowResponseDto followResponseDto = new FollowResponseDto(false, null);
+                return ResponseEntity.ok(followResponseDto);
+            }
         }
         else
         {
