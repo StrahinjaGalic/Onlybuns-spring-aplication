@@ -50,6 +50,7 @@ public class User {
     private String activationToken;
 
     public LocalDate lastActivity;
+    public int postsSeen;
     
 
     

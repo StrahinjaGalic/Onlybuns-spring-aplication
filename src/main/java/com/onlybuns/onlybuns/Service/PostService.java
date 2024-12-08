@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.onlybuns.onlybuns.Model.Location;
 import com.onlybuns.onlybuns.Model.Post;
+import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Repository.PostRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +27,9 @@ public class PostService {
     private ImageService imageService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private LocationService locationService;
 
     public Post createPost(Post post) {
@@ -33,7 +37,10 @@ public class PostService {
 
         
        post.setLocation(location);
-
+        User user = userService.findUserByUsername(post.getUsername()).get();
+        user.setPostsSeen(user.getPostsSeen()+1);
+        userService.Update(user);
+        
         return postRepository.save(post);
     }
 
