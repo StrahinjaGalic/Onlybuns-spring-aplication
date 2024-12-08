@@ -69,11 +69,13 @@ public class UserService implements UserDetailsService {
             {
                 long likes = 0;
                 List<Post> posts = postService.getByUsername(user.getUsername());
+                int postNum = postService.getAllPosts().size();
                 for(Post post : posts){
                     likes = likes + likeService.countLikesByPost(post.getId());
                 }
                 
-                emailService.sendInactiveEmail(user.getEmail(),user.getUsername(),likes);
+                int notSeen = postNum - user.getPostsSeen();
+                emailService.sendInactiveEmail(user.getEmail(),user.getUsername(),likes,notSeen);
             }
         }
     }
@@ -106,6 +108,7 @@ public class UserService implements UserDetailsService {
         if (user.getRole() == null) {
             user.setRole(Role.USER);
         }
+        user.setPostsSeen(0);
 
         User savedUser = userRepository.save(user);
         String activationLink = "http://localhost:8080/api/users/activate?token=" + activationToken;
@@ -154,6 +157,7 @@ public class UserService implements UserDetailsService {
 
             String token = jwtService.generateToken(user.get().getUsername());
             user_model.setLastActivity(LocalDate.now());
+            user_model.setPostsSeen(postService.getAllPosts().size());
             userRepository.save(user_model);
           
  
@@ -168,5 +172,10 @@ public class UserService implements UserDetailsService {
     public List<User> getAll()
     {
         return userRepository.findAll();
+    }
+
+    public User Update(User user)
+    {
+        return userRepository.save(user);
     }
 }
