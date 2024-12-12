@@ -74,7 +74,7 @@ public class SecurityConfig {
                 "/api/likes/delete/{id}","/api/likes/user/{username}","/api/likes/post/{username}/{postId}","/api/likes/create",
                 "/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}","/api/comments/create",
                 "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create",
-                "/api/follows/delete/{id}","/api/follows/check"
+                "/api/follows/delete/{id}","/api/follows/check","api/locations"
                 ).permitAll()
                 .requestMatchers(
                 "/api/posts/create","/api/images","/api/locations/create"

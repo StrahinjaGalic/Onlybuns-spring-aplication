@@ -1,13 +1,18 @@
 package com.onlybuns.onlybuns.Service;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.onlybuns.onlybuns.Model.Location;
 import com.onlybuns.onlybuns.Model.Post;
+import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Repository.PostRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -18,22 +23,49 @@ public class PostService {
     @Autowired
     public PostRepository postRepository;
 
-    // If you are going to use ImageService, you might want to keep this
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private LocationService locationService;
+
     public Post createPost(Post post) {
-        return postRepository.save(post); // Saving post and returning the saved instance
+       Location location = locationService.createLocation(post.getLocation());
+
+        
+       post.setLocation(location);
+        User user = userService.findUserByUsername(post.getUsername()).get();
+        user.setPostsSeen(user.getPostsSeen()+1);
+        userService.Update(user);
+        
+        return postRepository.save(post);
     }
 
     @Transactional
     public List<Post> getAllPosts() {
-        return postRepository.findByDeletedFalse(); // Retrieve all posts
+        List<Post> posts =  postRepository.findByDeletedFalse(); // Retrieve all posts
+        posts.forEach(post -> Hibernate.initialize(post.getLocation()));
+        return posts;
     }
 
-    public Optional<Post> getPostById(Long id) {
-        return postRepository.findById(id); // Retrieve a post by its ID
+    
+    public Optional<Post> getPostById(Long postId) {
+        Optional<Post> post = postRepository.findById(postId);
+ 
+        if (post.isPresent()) {
+
+            Location location = locationService.getLocationForPost(postId);
+            post.get().setLocation(location); // Set the cached location in the Post object
+ 
+            return post;
+       }
+ 
+        return Optional.empty();
     }
+
 
     public void deletePost(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found with Id " + id));
