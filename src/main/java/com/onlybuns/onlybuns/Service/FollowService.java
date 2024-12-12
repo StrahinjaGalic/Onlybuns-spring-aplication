@@ -9,11 +9,14 @@ import com.onlybuns.onlybuns.Dto.FollowResponseDto;
 import com.onlybuns.onlybuns.Model.Follow;
 import com.onlybuns.onlybuns.Repository.FollowRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class FollowService {
     @Autowired
     FollowRepository followRepository;
 
+    @Transactional
     public Follow create(Follow follow) 
     {
         if(follow.getUsername().isEmpty() && follow.getFollowingUsername().isEmpty())
