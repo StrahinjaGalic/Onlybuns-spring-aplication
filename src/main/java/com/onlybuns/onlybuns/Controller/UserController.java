@@ -2,7 +2,10 @@ package com.onlybuns.onlybuns.Controller;
 
 import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
+import com.onlybuns.onlybuns.Service.RateLimiterService;
 import com.onlybuns.onlybuns.Service.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -25,6 +26,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RateLimiterService rateLimiterService; 
 
     //accoutn registration
     @PostMapping("/register")
@@ -64,25 +68,35 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginRequest, HttpServletRequest request) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
-    
+
+        // Get IP address from the request
+        String ipAddress = request.getRemoteAddr(); 
+        System.out.println(ipAddress);
+
+        // Check if the IP address is allowed to make login attempts
+        if (!rateLimiterService.isAllowed(ipAddress)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body("Too many login attempts. Please try again later.");
+        }
+
         Optional<User> userOpt = userService.findUserByUsername(username);
-    
+
         // Check if the user exists and is active
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-    
+
             if (!user.isActive()) {
                 // Return a forbidden response if the account is inactive
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Account is inactive. Please contact support.");
             }
-    
+
             // Authenticate the user and get a token if active
             Optional<String> token = userService.loginUser(username, password);
             Role role = user.getRole();
-    
+
             if (token.isPresent()) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", token.get());
@@ -96,6 +110,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
     }
+
+
+
+
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> allUsers = userService.getAll();
