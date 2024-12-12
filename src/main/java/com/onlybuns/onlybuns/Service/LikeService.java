@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import com.onlybuns.onlybuns.Model.Like;
 import com.onlybuns.onlybuns.Repository.LikeRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class LikeService {
     @Autowired
     public LikeRepository likeRepository;
 
+    @Transactional
     public Like createLike(Like like)
     {
         return likeRepository.save(like);
