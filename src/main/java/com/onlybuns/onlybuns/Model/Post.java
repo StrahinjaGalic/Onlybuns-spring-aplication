@@ -47,5 +47,6 @@ public class Post {
 
     private boolean deleted;
     private boolean edited;
+    private boolean advertised;
 
 }

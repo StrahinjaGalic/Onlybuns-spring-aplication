@@ -75,7 +75,7 @@ public class SecurityConfig {
                 "/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}","/api/comments/create",
                 "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create",
                 "/api/follows/delete/{id}","/api/follows/check","api/locations","/actuator/prometheus","/metrics",
-                "/actuator/metrics","/actuator/**"
+                "/actuator/metrics","/actuator/**","/api/posts/{id}/advertise"
                 ).permitAll()
                 .requestMatchers(
                 "/api/posts/create","/api/images","/api/locations/create"
