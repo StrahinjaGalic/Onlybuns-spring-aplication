@@ -20,6 +20,11 @@ public class PostController {
     
     @Autowired
     private PostService postService;
+
+    @PostMapping("/{id}/advertise")
+    public void markPostAsAdvertisable(@PathVariable Long id) {
+        postService.markPostAsAdvertisable(id);
+    }
     
     @PostMapping("/create")
     public ResponseEntity<String> createPost(@RequestBody Post post) {

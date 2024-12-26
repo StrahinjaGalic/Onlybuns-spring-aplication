@@ -3,6 +3,8 @@ package com.onlybuns.onlybuns.Controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+import org.apache.catalina.filters.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.onlybuns.onlybuns.Dto.CommentDto;
 import com.onlybuns.onlybuns.Model.Comment;
+import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Service.CommentService;
+import com.onlybuns.onlybuns.Service.RateLimiterService;
+import com.onlybuns.onlybuns.Service.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +32,22 @@ public class CommentController {
     @Autowired
     public CommentService commentService;
 
+    @Autowired
+    public UserService userService;
+
+    private final RateLimiterService rateLimiterService;
+
+    @Autowired
+    public CommentController(RateLimiterService rateLimiterService) {
+        this.rateLimiterService = rateLimiterService;
+
+    }
     @PostMapping("/create")
     public ResponseEntity<String> createComment(@RequestBody Comment comment) {
         try
         {
-            if(!comment.getComment().isEmpty() && comment.getPost() != null && !comment.getUsername().isEmpty())
+            User user = userService.findUserByUsername(comment.getUsername()).get();
+            if(!comment.getComment().isEmpty() && comment.getPost() != null && !comment.getUsername().isEmpty() && rateLimiterService.isRequestAllowed(user.getId()))
             {
                 commentService.createComment(comment);
                 return new ResponseEntity<>("Comment created.", HttpStatus.CREATED);
