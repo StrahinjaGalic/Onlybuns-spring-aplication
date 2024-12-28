@@ -1,9 +1,11 @@
 package com.onlybuns.onlybuns.Service;
 
 import org.hibernate.Hibernate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.onlybuns.onlybuns.Messaging.RabbitMQConfig;
 import com.onlybuns.onlybuns.Model.Location;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Model.User;
@@ -32,6 +34,9 @@ public class PostService {
     @Autowired
     private LocationService locationService;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     public Post createPost(Post post) {
        Location location = locationService.createLocation(post.getLocation());
 
@@ -46,7 +51,7 @@ public class PostService {
 
     @Transactional
     public List<Post> getAllPosts() {
-        List<Post> posts =  postRepository.findByDeletedFalse(); // Retrieve all posts
+        List<Post> posts =  postRepository.findAllPostsSorted(); // Retrieve all posts
         posts.forEach(post -> Hibernate.initialize(post.getLocation()));
         return posts;
     }
@@ -66,6 +71,27 @@ public class PostService {
         return Optional.empty();
     }
 
+    public void markPostAsAdvertisable(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        
+        if (!post.isAdvertised())
+        {
+
+            post.setAdvertised(true);
+            updatePost(postId, post);
+            // Prepare message payload
+            String message = String.format(
+                "Description: %s, Created At: %s, Username: %s",
+                post.getDescription(),
+                post.getCreationTime(),
+                post.getUsername()
+            );
+
+            // Send to RabbitMQ
+            rabbitTemplate.convertAndSend(RabbitMQConfig.FANOUT_EXCHANGE, "", message);
+        }
+       
+    }
 
     public void deletePost(Long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Post not found with Id " + id));

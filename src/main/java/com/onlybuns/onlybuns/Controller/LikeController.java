@@ -19,8 +19,11 @@ import com.onlybuns.onlybuns.Dto.LikeDto;
 import com.onlybuns.onlybuns.Dto.LikeResponseDto;
 import com.onlybuns.onlybuns.Model.Like;
 import com.onlybuns.onlybuns.Model.Post;
+import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Service.LikeService;
 import com.onlybuns.onlybuns.Service.PostService;
+import com.onlybuns.onlybuns.Service.RateLimiterService;
+import com.onlybuns.onlybuns.Service.UserService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -34,13 +37,24 @@ public class LikeController {
     public LikeService likeService;
     @Autowired
     public PostService postService;
+    @Autowired
+    public UserService userService;
+
+    private final RateLimiterService rateLimiterService;
+
+
+      @Autowired
+        public LikeController(RateLimiterService rateLimiterService) {
+        this.rateLimiterService = rateLimiterService;
+        }
 
     @PostMapping("/create")
     public ResponseEntity<String> createLike(@RequestBody Like like) 
     {
         try
         {
-            if(like.getPost() != null & like.getUsername() != null)
+            User user = userService.findUserByUsername(like.getUsername()).get();
+            if(like.getPost() != null & like.getUsername() != null & rateLimiterService.isRequestAllowed(user.getId()))
             {
                 likeService.createLike(like);
                 return new ResponseEntity<>("Like created.",HttpStatus.CREATED);
