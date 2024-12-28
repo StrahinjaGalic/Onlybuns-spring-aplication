@@ -44,5 +44,8 @@ public class LikeService {
     {
         return likeRepository.getLikeIdByPostIdAndUsername(postId,username);
     }
+    public List<Like> getAllLikes() {
+        return likeRepository.findAll();
+    }
 
 }

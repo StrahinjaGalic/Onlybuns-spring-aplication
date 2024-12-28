@@ -1,5 +1,6 @@
 package com.onlybuns.onlybuns.Service;
 
+import com.onlybuns.onlybuns.Dto.UserDto;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
@@ -178,4 +179,24 @@ public class UserService implements UserDetailsService {
     {
         return userRepository.save(user);
     }
+
+    public User updateUser(String username, UserDto userDto) {
+        User existingUser = userRepository.findByUsername(username);
+
+        if(existingUser == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+            
+        // Update fields selectively
+        existingUser.setName(userDto.name);
+        existingUser.setSurname(userDto.surname);
+        existingUser.setAddress(userDto.address);
+
+        if (userDto.password != null) {
+            existingUser.setPassword(passwordEncoder.encode(userDto.password)); // Encode the password
+        }
+
+        return userRepository.save(existingUser);
+    }
+
 }
