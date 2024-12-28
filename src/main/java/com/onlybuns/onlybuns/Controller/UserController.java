@@ -3,7 +3,7 @@ package com.onlybuns.onlybuns.Controller;
 import com.onlybuns.onlybuns.Dto.UserDto;
 import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
-import com.onlybuns.onlybuns.Service.RateLimiterService;
+import com.onlybuns.onlybuns.Service.LoginLimiterService;
 import com.onlybuns.onlybuns.Service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private RateLimiterService rateLimiterService;
+    private LoginLimiterService rateLimiterService;
 
     // accoutn registration
     @PostMapping("/register")

@@ -1,0 +1,24 @@
+[
+    {
+      "id": "1",
+      "name": "Rabbit Shelter A",
+      "location": "123 Rabbit Street",
+      "latitude": 42.3601,
+      "longitude": -71.0589
+    },
+    {
+      "id": "2",
+      "name": "Rabbit Vet B",
+      "location": "456 Bunny Blvd",
+      "latitude": 34.0522,
+      "longitude": -118.2437
+    },
+    {
+      "id": "3",
+      "name": "Rabbit Rescue C",
+      "location": "789 Carrot Ave",
+      "latitude": 51.5074,
+      "longitude": -0.1278
+    }
+  ]
+  
