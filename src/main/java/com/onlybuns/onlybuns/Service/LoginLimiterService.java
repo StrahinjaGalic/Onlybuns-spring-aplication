@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class RateLimiterService {
+public class LoginLimiterService {
 
     private static final int MAX_ATTEMPTS = 5;
     private static final long WINDOW_IN_MILLIS = TimeUnit.MINUTES.toMillis(1); // 1 minute
