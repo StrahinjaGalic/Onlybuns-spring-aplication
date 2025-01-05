@@ -47,8 +47,8 @@ const sendMessage = async (location) => {
   }
 };
 
-// Cron job: svakih 10 minuta pošaljemo jednu lokaciju
-cron.schedule('* * * * *', () => {
+// Cron job: svakih 5 minuta pošaljemo jednu lokaciju
+cron.schedule('*/5 * * * *', () => {
   if (locations.length > 0 && currentIndex < locations.length) {
     const location = locations[currentIndex];
     sendMessage(location);  // Pošaljemo trenutnu lokaciju
