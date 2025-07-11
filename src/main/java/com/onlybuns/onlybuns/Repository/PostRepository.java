@@ -12,5 +12,4 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     List<Post> findByDeletedFalse();
     @Query("SELECT p FROM Post p WHERE p.deleted = false ORDER BY p.advertised DESC, p.creationTime DESC")
     List<Post> findAllPostsSorted();
-    
 }
