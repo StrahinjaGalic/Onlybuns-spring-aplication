@@ -91,4 +91,13 @@ public class PostController {
             return new ResponseEntity<>("Failed to edit post.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<Post>> getNearbyPosts(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(defaultValue = "5") double radiusKm) {
+        List<Post> nearbyPosts = postService.findPostsNearby(latitude, longitude, radiusKm);
+        return ResponseEntity.ok(nearbyPosts);
+    }
 }
