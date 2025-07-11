@@ -126,4 +126,22 @@ public class UserController {
         }
     }
 
+    @GetMapping("/check-username/{username}")
+    public ResponseEntity<Map<String, Object>> checkUsernameAvailability(@PathVariable String username) {
+        Map<String, Object> response = new HashMap<>();
+        boolean isAvailable = userService.isUsernameAvailable(username);
+        
+        response.put("username", username);
+        response.put("available", isAvailable);
+        response.put("usedBloomFilter", true);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/bloom-filter/stats")
+    public ResponseEntity<Map<String, Object>> getBloomFilterStats() {
+        Map<String, Object> stats = userService.getBloomFilterStats();
+        return ResponseEntity.ok(stats);
+    }
+
 }
