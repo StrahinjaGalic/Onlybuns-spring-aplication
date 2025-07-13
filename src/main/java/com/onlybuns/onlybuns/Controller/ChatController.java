@@ -12,8 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.onlybuns.onlybuns.Dto.AddUserPayloadDto;
+import com.onlybuns.onlybuns.Dto.RemoveUserPayloadDto;
 import com.onlybuns.onlybuns.Model.Chat;
+import com.onlybuns.onlybuns.Model.Message;
+import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Service.ChatService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/chats")
@@ -34,5 +40,40 @@ public class ChatController {
     public List<Chat> getUserChats(@PathVariable String username) {
         return chatService.findAllChatsByUser(username);
     }
+    @GetMapping("/{chatId}/messages")
+    public ResponseEntity<List<Message>> getChatMessages(@PathVariable Long chatId) {
+        List<Message> messages = chatService.findMessagesByChatId(chatId);
+        return ResponseEntity.ok(messages);
+    }
+    @PostMapping("/addUser")
+    public ResponseEntity<?> addUserToChat(@RequestBody AddUserPayloadDto payload) {
+        
+        chatService.addParticipantToChat(
+            payload.getChatId(),
+            payload.getUsernameToAdd(),
+            payload.getAdminUsername()
+        );
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping("/removeUser")
+    public ResponseEntity<?> removeUserFromChat(@RequestBody RemoveUserPayloadDto payload) {
+        chatService.removeParticipantFromChat(
+            payload.getChatId(),
+            payload.getUsernameToRemove(),
+            payload.getAdminUsername()
+        );
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/participants/{chatId}")
+    public ResponseEntity<List<User>> getMethodName(@PathVariable String chatId) 
+    {
+        return ResponseEntity.ok(chatService.findParticipantsByChatId(Long.parseLong(chatId)));
+    }
+    @GetMapping("/getAdmin/{chatId}")
+    public ResponseEntity<String> getAdminUsername(@PathVariable String chatId) {
+        return ResponseEntity.ok(chatService.getAdminUsernameByChatId(Long.parseLong(chatId)));
+    }
+    
+    
 
 }

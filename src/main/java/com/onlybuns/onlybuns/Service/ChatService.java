@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Model.Chat;
@@ -89,26 +91,30 @@ public class ChatService {
             Chat chat = optionalChat.get();
             if (chat.getIsDeleted() != null && chat.getIsDeleted()) 
             {
-                throw new IllegalArgumentException("Chat is deleted");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chat is deleted");
             }
             if(!chat.getAdminName().equals(username)) 
             {
-                throw new IllegalArgumentException("Only the chat admin can remove participants");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Only the chat admin can remove participants");
             }
             User participant = userRepository.findByUsername(participantUsername);
             if (participant != null && chat.getParticipants().contains(participant)) 
             {
                 chat.getParticipants().remove(participant);
+                if(chat.getParticipants().size() == 2)
+                {
+                    chat.setIsGroupChat(false);
+                }
                 chatRepository.save(chat);
             } 
             else 
             {
-                throw new IllegalArgumentException("Participant does not exist in this chat");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant does not exist in this chat");
             }
         } 
         else 
         {
-            throw new IllegalArgumentException("Chat does not exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chat does not exist");
         }
     }
     public void sendMessage(Long chatId, String senderUsername, String content) 
@@ -227,6 +233,23 @@ public class ChatService {
         else 
         {
             throw new IllegalArgumentException("Message does not exist");
+        }
+    }
+    public String getAdminUsernameByChatId(Long chatId) 
+    {
+        Optional<Chat> optionalChat = chatRepository.findById(chatId);
+        if (optionalChat.isPresent()) 
+        {
+            Chat chat = optionalChat.get();
+            if (chat.getIsDeleted() != null && chat.getIsDeleted()) 
+            {
+                throw new IllegalArgumentException("Chat is deleted");
+            }
+            return chat.getAdminName();
+        } 
+        else 
+        {
+            throw new IllegalArgumentException("Chat does not exist");
         }
     }
 }

@@ -75,7 +75,8 @@ public class SecurityConfig {
                 "/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}","/api/comments/create",
                 "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create",
                 "/api/follows/delete/{id}","/api/follows/check","/api/locations","/actuator/prometheus","/metrics","/api/analytics","/api/analytics/get",
-                "/actuator/metrics","/actuator/**","/api/posts/{id}/advertise","/api/chats","/api/chats/create","/api/chats/user/{username}"
+                "/actuator/metrics","/actuator/**","/api/posts/{id}/advertise","/api/chats","/api/chats/create","/api/chats/user/{username}", "/ws-chat/**","/api/chats/{chatId}/messages",
+                "/api/chats/participants/{chatId}","/api/chats/addUser","/api/chats/removeUser","/api/chats/getAdmin/{chatId}"
                 ).permitAll()
                 .requestMatchers(
                 "/api/posts/create","/api/images","/api/locations/create"
