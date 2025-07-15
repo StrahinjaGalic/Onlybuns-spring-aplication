@@ -9,6 +9,7 @@ import com.onlybuns.onlybuns.Messaging.RabbitMQConfig;
 import com.onlybuns.onlybuns.Model.Location;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Model.User;
+import com.onlybuns.onlybuns.Repository.FollowRepository;
 import com.onlybuns.onlybuns.Repository.PostRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -24,6 +25,8 @@ public class PostService {
     
     @Autowired
     public PostRepository postRepository;
+    @Autowired
+    public FollowRepository followRepository;
 
     @Autowired
     private ImageService imageService;
@@ -54,6 +57,25 @@ public class PostService {
         List<Post> posts =  postRepository.findAllPostsSorted(); // Retrieve all posts
         posts.forEach(post -> Hibernate.initialize(post.getLocation()));
         return posts;
+    }
+    @Transactional
+    public List<Post> getPostsByFollowers(String username) {
+        
+        List<Post> allPosts = postRepository.findAllPostsSorted();
+        
+        List<String> followingUsernames = followRepository.findByUsername(username)
+                .stream()
+                .map(follow -> follow.getFollowingUsername())
+                .toList();
+        
+        List<Post> filteredPosts = allPosts.stream()
+                .filter(post -> followingUsernames.contains(post.getUsername()) || post.getUsername().equals(username))
+                .filter(post -> !post.isDeleted())
+                .toList();
+        
+        filteredPosts.forEach(post -> Hibernate.initialize(post.getLocation()));
+        
+        return filteredPosts;
     }
 
     
