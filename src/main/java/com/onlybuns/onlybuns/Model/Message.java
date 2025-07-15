@@ -1,6 +1,6 @@
 package com.onlybuns.onlybuns.Model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,6 +32,6 @@ public class Message {
     private Chat chat;
 
     private String content;
-    private Date timestamp;
+    private Timestamp timestamp;
     private Boolean isDeleted = false;
 }

@@ -1,5 +1,7 @@
 package com.onlybuns.onlybuns.Service;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Model.Chat;
+import com.onlybuns.onlybuns.Model.ChatParticipant;
 import com.onlybuns.onlybuns.Model.Message;
+import com.onlybuns.onlybuns.Repository.ChatParticipantRepository;
 import com.onlybuns.onlybuns.Repository.ChatRepository;
 import com.onlybuns.onlybuns.Repository.MessageRepository;
 import com.onlybuns.onlybuns.Repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -29,6 +35,8 @@ public class ChatService {
 
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ChatParticipantRepository chatParticipantRepository;
 
     public void createChat(String creatorUsername,String participantUsername) 
     {
@@ -36,16 +44,28 @@ public class ChatService {
         chat.setAdminName(creatorUsername);
         chat.setIsGroupChat(false);
         chat.setIsDeleted(false);
+        
+        // Sačuvaj chat PRVO da bi dobio ID
+        Chat savedChat = chatRepository.save(chat);
+        
         User creator = userRepository.findByUsername(creatorUsername);
         User participant = userRepository.findByUsername(participantUsername);
 
         if (creator == null || participant == null) {
             throw new IllegalArgumentException("Creator or participant does not exist");
         }
-        
-        chat.setParticipants(Arrays.asList(creator, participant));
-        
-        chatRepository.save(chat);
+        ChatParticipant creatorParticipant = new ChatParticipant();
+        creatorParticipant.setChat(savedChat);  // Koristi savedChat umesto chat
+        creatorParticipant.setUser(creator);
+        creatorParticipant.setTimeJoined(new java.sql.Timestamp(System.currentTimeMillis()));
+
+        ChatParticipant participantParticipant = new ChatParticipant();
+        participantParticipant.setChat(savedChat);  // Koristi savedChat umesto chat
+        participantParticipant.setUser(participant);
+        participantParticipant.setTimeJoined(new java.sql.Timestamp(System.currentTimeMillis()));
+
+        chatParticipantRepository.save(creatorParticipant);
+        chatParticipantRepository.save(participantParticipant);
     }
     public void addParticipantToChat(Long chatId, String participantUsername, String username) 
     {
@@ -61,20 +81,26 @@ public class ChatService {
             {
                 throw new IllegalArgumentException("Only the chat admin can add participants");
             }
-            User participant = userRepository.findByUsername(participantUsername);
-            if (participant != null) 
-            {
-                if(chat.getParticipants().contains(participant)) 
-                {
-                    throw new IllegalArgumentException("Participant already exists in this chat");
-                }
-                chat.getParticipants().add(participant);
+            
+            User participantUser = userRepository.findByUsername(participantUsername);
+            if (participantUser == null) {
+                throw new IllegalArgumentException("Participant does not exist");
+            }
+            
+            if(chatParticipantRepository.findByChatIdAndUsername(chatId, participantUsername).isPresent()) {
+                throw new IllegalArgumentException("Participant already exists in this chat");
+            }
+            
+            ChatParticipant participant = new ChatParticipant();
+            participant.setChat(chat);
+            participant.setUser(participantUser);
+            participant.setTimeJoined(new java.sql.Timestamp(System.currentTimeMillis()));
+            
+            chatParticipantRepository.save(participant);
+            
+            if (!chat.getIsGroupChat()) {
                 chat.setIsGroupChat(true);
                 chatRepository.save(chat);
-            } 
-            else 
-            {
-                throw new IllegalArgumentException("Participant does not exist");
             }
         } 
         else 
@@ -82,39 +108,50 @@ public class ChatService {
             throw new IllegalArgumentException("Chat does not exist");
         }
     }
-    public void removeParticipantFromChat(Long chatId, String participantUsername,String username) 
+    @Transactional
+    public void removeParticipantFromChat(Long chatId, String participantUsername, String username) 
     {
-        
         Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isPresent()) 
         {
             Chat chat = optionalChat.get();
             if (chat.getIsDeleted() != null && chat.getIsDeleted()) 
             {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chat is deleted");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chat is deleted");
             }
             if(!chat.getAdminName().equals(username)) 
             {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Only the chat admin can remove participants");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only the chat admin can remove participants");
             }
+            
             User participant = userRepository.findByUsername(participantUsername);
-            if (participant != null && chat.getParticipants().contains(participant)) 
+            if (participant != null) 
             {
-                chat.getParticipants().remove(participant);
-                if(chat.getParticipants().size() == 2)
+                if(chatParticipantRepository.findByChatIdAndUsername(chatId, participantUsername).isPresent()) 
                 {
-                    chat.setIsGroupChat(false);
+                    
+                    chatParticipantRepository.deleteByChatIdAndUserId(chatId, participant.getId());
+                    
+                    long remainingParticipants = chatParticipantRepository.countByChatId(chatId);
+                    if(remainingParticipants == 2) 
+                    {
+                        chat.setIsGroupChat(false);
+                        chatRepository.save(chat);
+                    }
+                } 
+                else 
+                {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant does not exist in this chat");
                 }
-                chatRepository.save(chat);
             } 
             else 
             {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant does not exist in this chat");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Participant does not exist");
             }
         } 
         else 
         {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Chat does not exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chat does not exist");
         }
     }
     public void sendMessage(Long chatId, String senderUsername, String content) 
@@ -123,11 +160,13 @@ public class ChatService {
         if (optionalChat.isPresent()) 
         {
             Chat chat = optionalChat.get();
+            Optional<ChatParticipant> optionalParticipant = chatParticipantRepository.findByChatIdAndUsername(chatId,senderUsername);
+
             if (chat.getIsDeleted() != null && chat.getIsDeleted()) 
             {
                 throw new IllegalArgumentException("Chat is deleted");
             }
-            if (!chat.getParticipants().stream().anyMatch(user -> user.getUsername().equals(senderUsername))) 
+            if (!optionalParticipant.isPresent()) 
             {
                 throw new IllegalArgumentException("Sender is not a participant in this chat");
             }
@@ -135,7 +174,7 @@ public class ChatService {
             message.setChat(chat);
             message.setSenderUsername(senderUsername);
             message.setContent(content);
-            message.setTimestamp(new java.sql.Date(System.currentTimeMillis()));
+            message.setTimestamp(new java.sql.Timestamp(System.currentTimeMillis()));
             message.setIsDeleted(false);
             messageRepository.save(message);
         } 
@@ -153,21 +192,46 @@ public class ChatService {
         }
         List<Chat> chats = chatRepository.findAll().stream()
             .filter(chat -> !Boolean.TRUE.equals(chat.getIsDeleted()))
-            .filter(chat -> chat.getParticipants().contains(user))
+            .filter(chat -> chatParticipantRepository.findByChatIdAndUsername(chat.getId(), username).isPresent())
             .collect(Collectors.toList());
         return chats;
     }
-    public List<Message> findMessagesByChatId(Long chatId) 
+    public List<Message> findMessagesByChatId(Long chatId,String username) 
     {
          Optional<Chat> optionalChat = chatRepository.findById(chatId);
         if (optionalChat.isPresent()) 
         {
             Chat chat = optionalChat.get();
+            Optional<ChatParticipant> chatParticipant = chatParticipantRepository.findByChatIdAndUsername(chat.getId(), username);
+            if (!chatParticipant.isPresent()) 
+            {
+                throw new IllegalArgumentException("User is not a participant in this chat");
+            }
             if (chat.getIsDeleted() != null && chat.getIsDeleted()) 
             {
                 throw new IllegalArgumentException("Chat is deleted");
             }
-            return messageRepository.findByChatIdAndIsDeletedFalse(chatId);
+            Timestamp dateJoined = chatParticipant.get().getTimeJoined();
+            List<Message> allMessages = messageRepository.findByChatIdAndIsDeletedFalse(chatId);
+
+            allMessages.sort((m1, m2) -> m1.getTimestamp().compareTo(m2.getTimestamp()));
+
+            List<Message> messagesBeforeJoined = allMessages.stream()
+                .filter(message -> message.getTimestamp().before(dateJoined))
+                .collect(Collectors.toList());
+            List<Message> messagesAfterJoined = allMessages.stream()
+                .filter(message -> message.getTimestamp().after(dateJoined) || message.getTimestamp().equals(dateJoined))
+                .collect(Collectors.toList());
+
+            List<Message> last10BeforeJoined = messagesBeforeJoined.stream()
+            .skip(Math.max(0, messagesBeforeJoined.size() - 10))
+            .collect(Collectors.toList());
+        
+            List<Message> finalMessages = new ArrayList<>();
+            finalMessages.addAll(last10BeforeJoined);
+            finalMessages.addAll(messagesAfterJoined);
+            
+            return finalMessages;    
         } 
         else 
         {
@@ -184,7 +248,7 @@ public class ChatService {
             {
                 throw new IllegalArgumentException("Chat is deleted");
             }
-            return chatRepository.findParticipantsByChatId(chatId);
+            return chatParticipantRepository.findUsersByChatId(chatId);
         } 
         else 
         {

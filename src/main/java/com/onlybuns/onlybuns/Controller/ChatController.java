@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onlybuns.onlybuns.Dto.AddUserPayloadDto;
 import com.onlybuns.onlybuns.Dto.RemoveUserPayloadDto;
 import com.onlybuns.onlybuns.Model.Chat;
+import com.onlybuns.onlybuns.Model.ChatParticipant;
 import com.onlybuns.onlybuns.Model.Message;
 import com.onlybuns.onlybuns.Model.User;
 import com.onlybuns.onlybuns.Service.ChatService;
@@ -40,9 +41,10 @@ public class ChatController {
     public List<Chat> getUserChats(@PathVariable String username) {
         return chatService.findAllChatsByUser(username);
     }
-    @GetMapping("/{chatId}/messages")
-    public ResponseEntity<List<Message>> getChatMessages(@PathVariable Long chatId) {
-        List<Message> messages = chatService.findMessagesByChatId(chatId);
+    @GetMapping("/{chatId}/{username}/messages")
+    public ResponseEntity<List<Message>> getChatMessages(@PathVariable Long chatId,@PathVariable String username) 
+    {
+        List<Message> messages = chatService.findMessagesByChatId(chatId,username);
         return ResponseEntity.ok(messages);
     }
     @PostMapping("/addUser")
@@ -65,7 +67,7 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
     @GetMapping("/participants/{chatId}")
-    public ResponseEntity<List<User>> getMethodName(@PathVariable String chatId) 
+    public ResponseEntity<List<User>> getChatParticipants(@PathVariable String chatId) 
     {
         return ResponseEntity.ok(chatService.findParticipantsByChatId(Long.parseLong(chatId)));
     }

@@ -7,11 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.onlybuns.onlybuns.Model.Chat;
-import com.onlybuns.onlybuns.Model.User;
+import com.onlybuns.onlybuns.Model.ChatParticipant;
 
 public interface ChatRepository extends JpaRepository<Chat,Long> {
     Chat findById(long id);
-    
-    @Query("SELECT c.participants FROM Chat c WHERE c.id = :chatId")
-    List<User> findParticipantsByChatId(@Param("chatId") Long chatId);
 }
