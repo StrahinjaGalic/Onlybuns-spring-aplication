@@ -1,6 +1,6 @@
 package com.onlybuns.onlybuns.Model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,24 +15,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table(name = "comments")
+@Table(name = "messages")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Comment {
+public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
+
+    private String senderUsername;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", referencedColumnName = "id",nullable = false)
-    private Post post;
+    @JoinColumn(name = "chat_id",referencedColumnName = "id", nullable = false)
+    private Chat chat;
 
-    private String username;
-
-    private String comment;
-    private Date commentDate;
-
-    private boolean edited;
-    private boolean deleted;
+    private String content;
+    private Timestamp timestamp;
+    private Boolean isDeleted = false;
 }
