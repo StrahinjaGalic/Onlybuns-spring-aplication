@@ -1,5 +1,7 @@
 package com.onlybuns.onlybuns.Dto;
 
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,4 +11,5 @@ public class LikeDto {
     private Long id;
     private Long postId;
     private String username;
+    private Date createdTime;
 }

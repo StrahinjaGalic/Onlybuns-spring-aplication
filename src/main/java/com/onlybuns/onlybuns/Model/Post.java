@@ -6,6 +6,7 @@ import java.sql.Time;
 import jakarta.annotation.Generated;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,8 @@ public class Post {
 
     private String description;
     
-    @OneToOne(cascade = CascadeType.ALL)
+       
+    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false)
     private Location location;
 
@@ -45,5 +47,6 @@ public class Post {
 
     private boolean deleted;
     private boolean edited;
+    private boolean advertised;
 
 }

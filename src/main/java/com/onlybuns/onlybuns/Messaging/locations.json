@@ -1,0 +1,213 @@
+[
+  {
+    "id": "1",
+    "name": "Belgrade Bunny Care Center",
+    "location": "Bulevar kralja Aleksandra 125, Belgrade",
+    "latitude": 44.8125,
+    "longitude": 20.4612
+  },
+  {
+    "id": "2",
+    "name": "Novi Sad Rabbit Haven",
+    "location": "Bulevar oslobođenja 30, Novi Sad",
+    "latitude": 45.2671,
+    "longitude": 19.8335
+  },
+  {
+    "id": "3",
+    "name": "Niš Rabbit Sanctuary",
+    "location": "Obrenovićeva 15, Niš",
+    "latitude": 43.3209,
+    "longitude": 21.8958
+  },
+  {
+    "id": "4",
+    "name": "Subotica Bunny Hospital",
+    "location": "Matka Vukovića 5, Subotica",
+    "latitude": 46.1000,
+    "longitude": 19.6667
+  },
+  {
+    "id": "5",
+    "name": "Kragujevac Rabbit Clinic",
+    "location": "Kralja Petra I 34, Kragujevac",
+    "latitude": 44.0128,
+    "longitude": 20.9114
+  },
+  {
+    "id": "6",
+    "name": "Zagreb Bunny Paradise",
+    "location": "Ilica 45, Zagreb",
+    "latitude": 45.8150,
+    "longitude": 15.9819
+  },
+  {
+    "id": "7",
+    "name": "Ljubljana Rabbit Resort",
+    "location": "Prešernova 10, Ljubljana",
+    "latitude": 46.0569,
+    "longitude": 14.5058
+  },
+  {
+    "id": "8",
+    "name": "Sarajevo Bunny Shelter",
+    "location": "Ferhadija 12, Sarajevo",
+    "latitude": 43.8563,
+    "longitude": 18.4131
+  },
+  {
+    "id": "9",
+    "name": "Skopje Rabbit Rescue",
+    "location": "Makedonija 15, Skopje",
+    "latitude": 41.9973,
+    "longitude": 21.4280
+  },
+  {
+    "id": "10",
+    "name": "Podgorica Bunny Center",
+    "location": "Njegoševa 45, Podgorica",
+    "latitude": 42.4304,
+    "longitude": 19.2594
+  },
+  {
+    "id": "11",
+    "name": "Budapest Bunny Palace",
+    "location": "Andrássy út 22, Budapest",
+    "latitude": 47.4979,
+    "longitude": 19.0402
+  },
+  {
+    "id": "12",
+    "name": "Vienna Rabbit Resort",
+    "location": "Stephansplatz 8, Vienna",
+    "latitude": 48.2082,
+    "longitude": 16.3738
+  },
+  {
+    "id": "13",
+    "name": "Prague Rabbit Retreat",
+    "location": "Václavské náměstí 15, Prague",
+    "latitude": 50.0755,
+    "longitude": 14.4378
+  },
+  {
+    "id": "14",
+    "name": "Bratislava Bunny Lodge",
+    "location": "Hlavné námestie 4, Bratislava",
+    "latitude": 48.1486,
+    "longitude": 17.1077
+  },
+  {
+    "id": "15",
+    "name": "Warsaw Rabbit Sanctuary",
+    "location": "Nowy Świat 45, Warsaw",
+    "latitude": 52.2297,
+    "longitude": 21.0122
+  },
+  {
+    "id": "16",
+    "name": "Krakow Bunny Hospital",
+    "location": "Rynek Główny 12, Krakow",
+    "latitude": 50.0617,
+    "longitude": 19.9373
+  },
+  {
+    "id": "17",
+    "name": "Munich Rabbit Care",
+    "location": "Karlsplatz 8, Munich",
+    "latitude": 48.1351,
+    "longitude": 11.5820
+  },
+  {
+    "id": "18",
+    "name": "Dresden Bunny Clinic",
+    "location": "Altmarkt 3, Dresden",
+    "latitude": 51.0504,
+    "longitude": 13.7373
+  },
+  {
+    "id": "19",
+    "name": "Graz Rabbit Haven",
+    "location": "Hauptplatz 14, Graz",
+    "latitude": 47.0707,
+    "longitude": 15.4395
+  },
+  {
+    "id": "20",
+    "name": "Brno Bunny Sanctuary",
+    "location": "náměstí Svobody 7, Brno",
+    "latitude": 49.1951,
+    "longitude": 16.6068
+  },
+  {
+    "id": "21",
+    "name": "Berlin Bunny House",
+    "location": "Unter den Linden 25, Berlin",
+    "latitude": 52.5200,
+    "longitude": 13.4050
+  },
+  {
+    "id": "22",
+    "name": "Paris Rabbit Palace",
+    "location": "23 Rue de Rivoli, Paris",
+    "latitude": 48.8566,
+    "longitude": 2.3522
+  },
+  {
+    "id": "23",
+    "name": "Amsterdam Bunny Garden",
+    "location": "Damrak 15, Amsterdam",
+    "latitude": 52.3676,
+    "longitude": 4.9041
+  },
+  {
+    "id": "24",
+    "name": "Brussels Rabbit Resort",
+    "location": "Grand Place 8, Brussels",
+    "latitude": 50.8503,
+    "longitude": 4.3517
+  },
+  {
+    "id": "25",
+    "name": "Hamburg Bunny Care",
+    "location": "Mönckebergstraße 12, Hamburg",
+    "latitude": 53.5511,
+    "longitude": 9.9937
+  },
+  {
+    "id": "26",
+    "name": "Rotterdam Rabbit Clinic",
+    "location": "Coolsingel 42, Rotterdam",
+    "latitude": 51.9244,
+    "longitude": 4.4777
+  },
+  {
+    "id": "27",
+    "name": "Cologne Bunny Center",
+    "location": "Hohe Straße 85, Cologne",
+    "latitude": 50.9375,
+    "longitude": 6.9603
+  },
+  {
+    "id": "28",
+    "name": "Lyon Rabbit Sanctuary",
+    "location": "15 Place Bellecour, Lyon",
+    "latitude": 45.7640,
+    "longitude": 4.8357
+  },
+  {
+    "id": "29",
+    "name": "Antwerp Bunny Hospital",
+    "location": "Meir 25, Antwerp",
+    "latitude": 51.2194,
+    "longitude": 4.4025
+  },
+  {
+    "id": "30",
+    "name": "Frankfurt Rabbit Haven",
+    "location": "Zeil 106, Frankfurt",
+    "latitude": 50.1109,
+    "longitude": 8.6821
+  }
+]
+  

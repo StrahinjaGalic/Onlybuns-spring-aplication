@@ -20,6 +20,11 @@ public class PostController {
     
     @Autowired
     private PostService postService;
+
+    @PostMapping("/{id}/advertise")
+    public void markPostAsAdvertisable(@PathVariable Long id) {
+        postService.markPostAsAdvertisable(id);
+    }
     
     @PostMapping("/create")
     public ResponseEntity<String> createPost(@RequestBody Post post) {
@@ -85,5 +90,14 @@ public class PostController {
         {
             return new ResponseEntity<>("Failed to edit post.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<Post>> getNearbyPosts(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam(defaultValue = "5") double radiusKm) {
+        List<Post> nearbyPosts = postService.findPostsNearby(latitude, longitude, radiusKm);
+        return ResponseEntity.ok(nearbyPosts);
     }
 }

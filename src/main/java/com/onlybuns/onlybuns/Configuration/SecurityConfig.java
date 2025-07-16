@@ -69,11 +69,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                 "/api/users/register", "/api/users/activate","/api/users/login", "/api/users/{username}",
-                "api/locations/{id}",
+                "api/locations/{id}","api/users/update/{username}","/api/likes/all","api/rabbitCare/locations",
                 "/api/posts/{id}","/api/posts/user/{username}","/api/posts/delete/{id}","/api/posts/edit/{id}","/api/posts",
                 "/api/likes/delete/{id}","/api/likes/user/{username}","/api/likes/post/{username}/{postId}","/api/likes/create",
                 "/api/comments/delete/{id}","/api/comments/user/{username}","/api/comments/post/{postId}","/api/comments/create",
-                "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create"
+                "/api/follows/{username}/following","/api/follows/{username}/followers","/api/follows/create",
+                "/api/follows/delete/{id}","/api/follows/check","api/locations","/actuator/prometheus","/metrics",
+                "/actuator/metrics","/actuator/**","/api/posts/{id}/advertise"
                 ).permitAll()
                 .requestMatchers(
                 "/api/posts/create","/api/images","/api/locations/create"
