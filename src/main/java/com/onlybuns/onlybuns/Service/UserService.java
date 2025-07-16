@@ -1,5 +1,6 @@
 package com.onlybuns.onlybuns.Service;
 
+import com.onlybuns.onlybuns.Dto.UserDto;
 import com.onlybuns.onlybuns.Model.Post;
 import com.onlybuns.onlybuns.Model.Role;
 import com.onlybuns.onlybuns.Model.User;
@@ -20,7 +21,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,16 +48,32 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private BloomFilter bloomFilter;
 
     @PostConstruct
     public void init() throws java.io.IOException, MessagingException{
         try{
+            // Initialize Bloom Filter with existing usernames
+            initializeBloomFilter();
             sendInactiveNotifications();
 
         } catch (IOException e){
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * Initialize Bloom Filter with all existing usernames
+     */
+    private void initializeBloomFilter() {
+        List<User> allUsers = userRepository.findAll();
+        List<String> usernames = allUsers.stream()
+                .map(User::getUsername)
+                .toList();
+        bloomFilter.initializeWith(usernames);
+        System.out.println("Bloom Filter initialized with " + usernames.size() + " usernames");
     }
 
     public void sendInactiveNotifications() throws java.io.IOException, MessagingException
@@ -91,9 +110,15 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User registerUser(User user) throws Exception {
-        if (userRepository.findByUsername(user.getUsername()) != null) {
-            throw new Exception("Username is already taken");
+        // First check Bloom Filter for quick username existence check
+        if (bloomFilter.mightContain(user.getUsername())) {
+            // Bloom Filter says username might exist, so check database
+            if (userRepository.findByUsername(user.getUsername()) != null) {
+                throw new Exception("Username is already taken");
+            }
+            // If we reach here, it was a false positive from Bloom Filter
         }
+        // If Bloom Filter says username definitely doesn't exist, skip database check
 
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new Exception("Email is already registered");
@@ -111,6 +136,10 @@ public class UserService implements UserDetailsService {
         user.setPostsSeen(0);
 
         User savedUser = userRepository.save(user);
+        
+        // Add the new username to Bloom Filter
+        bloomFilter.add(user.getUsername());
+        
         String activationLink = "http://localhost:8080/api/users/activate?token=" + activationToken;
 
         sendActivationEmail(savedUser.getEmail(), activationLink);
@@ -178,4 +207,51 @@ public class UserService implements UserDetailsService {
     {
         return userRepository.save(user);
     }
+
+    public User updateUser(String username, UserDto userDto) {
+        User existingUser = userRepository.findByUsername(username);
+
+        if(existingUser == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+            
+        // Update fields selectively
+        existingUser.setName(userDto.name);
+        existingUser.setSurname(userDto.surname);
+        existingUser.setAddress(userDto.address);
+
+        if (userDto.password != null) {
+            existingUser.setPassword(passwordEncoder.encode(userDto.password)); // Encode the password
+        }
+
+        return userRepository.save(existingUser);
+    }
+
+    /**
+     * Check if username is available using Bloom Filter optimization
+     */
+    public boolean isUsernameAvailable(String username) {
+        // First check Bloom Filter
+        if (!bloomFilter.mightContain(username)) {
+            // Bloom Filter says username definitely doesn't exist, so it's available
+            return true;
+        }
+        
+        // Bloom Filter says username might exist, check database for sure
+        User existingUser = userRepository.findByUsername(username);
+        return existingUser == null;
+    }
+
+    /**
+     * Get Bloom Filter statistics for monitoring
+     */
+    public Map<String, Object> getBloomFilterStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("size", bloomFilter.getSize());
+        stats.put("approximateElementCount", bloomFilter.getApproximateElementCount());
+        stats.put("estimatedFalsePositiveRate", 
+                bloomFilter.estimateFalsePositiveRate(bloomFilter.getApproximateElementCount()));
+        return stats;
+    }
+
 }

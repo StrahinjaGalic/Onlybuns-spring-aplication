@@ -1,6 +1,8 @@
 package com.onlybuns.onlybuns.Model;
 
 
+import java.sql.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,4 +31,6 @@ public class Like {
     private Post post;
     
     private String username;
+
+    private Date createdTime;
 }

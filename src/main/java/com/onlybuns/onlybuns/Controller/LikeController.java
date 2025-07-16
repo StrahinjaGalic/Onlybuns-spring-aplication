@@ -90,7 +90,7 @@ public class LikeController {
     public ResponseEntity<List<LikeDto>> getLikesByUsername(@PathVariable String username) 
     {
         List<Like> likes = likeService.getAllLikesByUser(username);
-        List<LikeDto> likeDtos = likes.stream().map(like -> new LikeDto(like.getId(),like.getPost().getId(),like.getUsername())).collect(Collectors.toList());
+        List<LikeDto> likeDtos = likes.stream().map(like -> new LikeDto(like.getId(),like.getPost().getId(),like.getUsername(), like.getCreatedTime())).collect(Collectors.toList());
         return ResponseEntity.ok(likeDtos);
     }
     /* 
@@ -120,7 +120,13 @@ public class LikeController {
         return ResponseEntity.ok(response);
     }
     
-    
+    @GetMapping("/all")
+    public ResponseEntity<List<LikeDto>> getAllLikes() 
+    {
+        List<Like> likes = likeService.getAllLikes();
+        List<LikeDto> likeDtos = likes.stream().map(like -> new LikeDto(like.getId(),like.getPost().getId(),like.getUsername(),like.getCreatedTime())).collect(Collectors.toList());
+        return ResponseEntity.ok(likeDtos);
+    }
     
 
 }

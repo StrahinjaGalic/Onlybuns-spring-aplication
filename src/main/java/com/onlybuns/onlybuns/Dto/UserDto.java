@@ -1,12 +1,13 @@
 package com.onlybuns.onlybuns.Dto;
 
 public class UserDto {
-    private String email;
-    private String username;
-    private String password;
-    private String confirmPassword;
-    private String name;
-    private String address;
-    private String token; 
-    private int postsSeen;
+    public String email;
+    public String username;
+    public String password;
+    public String confirmPassword;
+    public String name;
+    public String surname;
+    public String address;
+    public String token; 
+    public int postsSeen;
 }
