@@ -8,6 +8,8 @@ public class UserDto {
     public String name;
     public String surname;
     public String address;
+    public Double latitude;
+    public Double longitude;
     public String token; 
     public int postsSeen;
 }
